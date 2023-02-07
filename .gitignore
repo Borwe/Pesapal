@@ -1,0 +1,5 @@
+#emacs files
+*~
+
+#for holding temp files
+.tmp
