@@ -3,3 +3,8 @@
 
 #for holding temp files
 .tmp
+*.bin
+
+#node stuff
+build/
+node_modules/

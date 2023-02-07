@@ -1,0 +1,17 @@
+{
+  "name": "pesapal",
+  "version": "1.0.0",
+  "description": "Answers to the pesapal questions 2023 Feb dev position",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "q0_p1": "tsc && node ./build/p1.js"
+  },
+  "author": "brian.orwe@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
+  }
+}
