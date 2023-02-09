@@ -51,20 +51,15 @@ function handle_writing_li_bytes(line:string,
         //try getting the two bytes that are involved
         let p1 = ox+d.slice(6,8);
         let p2 = ox+d.slice(8,10);
-        console.log("p1:",p1);
-        console.log("p2:",p2);
         data = new Uint8Array([Number(p1),Number(p2)]);
     }else{
         let num = labels.get(line_split[2]);
         if(num!=undefined){
             //use address and insert a split if it is more than 255
             if(num>255){
-                console.log("p1:")
                 data = new Uint8Array([num, 255-num]);
-                console.log("d:",data[0],data[1]);
             }else{
                 data = new Uint8Array([num]);
-                console.log("d:",data[0]);
             }
         }else{
             console
@@ -78,7 +73,6 @@ function handle_writing_li_bytes(line:string,
         let op_code_reg = op_code_num |
             (Number(line_split[1][1])<<4) 
 
-        console.log("data: ",data,"length: ",data.length);
         if(data.length==2){
             let bytes = new Uint8Array([op_code_reg,
                 data[0],data[1]]);
@@ -253,10 +247,12 @@ async function produce_bytes(in_file:string, out_file:string){
             case "beq": handle_writing_beq_bytes(line_split,out_file);break;
             case "inc": handle_writing_inc_bytes(line_split,out_file);break;
             case "dec": handle_writing_dec_bytes(line_split,out_file);break;
-            default: console.log("Not handling:",line_split[0])
+            default: {
+                console.error("Not handling invalid instruction:",
+                    line_split[0])
+                process.exit(-1);
+            }
         }
-
-        console.log(line_split);
     }
 }
 
