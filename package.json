@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "q0_p1": "tsc && node ./build/p1.js"
+    "q0_p1": "tsc && node ./build/p1.js",
+    "q0_p2": "tsc && node ./build/p2.js"
   },
   "author": "brian.orwe@gmail.com",
   "license": "MIT",
