@@ -5,7 +5,7 @@ type address = number;
 
 /** Hold opcodes with their mnemonics */
 let op_codes = new Map<string,number>([["halt",0x0], ["nop",0x1], ["li",0x2],
-    ["lw",0x3],["sw",0x4], ["add",0x5], ["sum",0x6], ["mult",0x7],
+    ["lw",0x3],["sw",0x4], ["add",0x5], ["sub",0x6], ["mult",0x7],
     ["div",0x8], ["j",0x9], ["jr",0xA], ["beq",0xB], ["bne",0xC],
     ["inc",0xD], ["dec",0xE]]);
 
@@ -128,6 +128,94 @@ function handle_writing_sw_bytes(line_split: string[], out_file: string){
     write_bytes(out_file, bytes);
 }
 
+function handle_writing_add_bytes(line_split: string[], out_file: string){
+    let lw_op = op_codes.get(line_split[0].toLowerCase())!;
+    let lw_op_and_r = lw_op | Number(line_split[1][1]) << 4;
+    let second_r_and_third_r = Number(line_split[2][1]) | 
+        Number(line_split[3][1]) << 4;
+    const bytes = new Uint8Array([lw_op_and_r, second_r_and_third_r]);
+    write_bytes(out_file, bytes);
+}
+
+
+function handle_writing_sub_bytes(line_split: string[], out_file: string){
+    let lw_op = op_codes.get(line_split[0].toLowerCase())!;
+    let lw_op_and_r = lw_op | Number(line_split[1][1]) << 4;
+    let second_r_and_third_r = Number(line_split[2][1]) | 
+        Number(line_split[3][1]) << 4;
+    const bytes = new Uint8Array([lw_op_and_r, second_r_and_third_r]);
+    write_bytes(out_file, bytes);
+}
+
+
+function handle_writing_mult_bytes(line_split: string[], out_file: string){
+    let lw_op = op_codes.get(line_split[0].toLowerCase())!;
+    let lw_op_and_r = lw_op | Number(line_split[1][1]) << 4;
+    let second_r_and_third_r = Number(line_split[2][1]) | 
+        Number(line_split[3][1]) << 4;
+    const bytes = new Uint8Array([lw_op_and_r, second_r_and_third_r]);
+    write_bytes(out_file, bytes);
+}
+
+
+function handle_writing_div_bytes(line_split: string[], out_file: string){
+    let lw_op = op_codes.get(line_split[0].toLowerCase())!;
+    let lw_op_and_r = lw_op | Number(line_split[1][1]) << 4;
+    let second_r_and_third_r = Number(line_split[2][1]) | 
+        Number(line_split[3][1]) << 4;
+    const bytes = new Uint8Array([lw_op_and_r, second_r_and_third_r]);
+    write_bytes(out_file, bytes);
+}
+
+
+function handle_writing_j_bytes(line_split: string[], out_file: string){
+    let lw_op = op_codes.get(line_split[0].toLowerCase())!;
+    let data_b1 = Number('0x'+line_split[1].slice(6,8));
+    let data_b2 = Number('0x'+line_split[1].slice(8,10));
+    const bytes = new Uint8Array([lw_op, data_b1, data_b2]);
+    write_bytes(out_file, bytes);
+}
+
+
+function handle_writing_jr_bytes(line_split: string[], out_file: string){
+    let lw_op = op_codes.get(line_split[0].toLowerCase())!;
+    let reg = Number(line_split[1][1]);
+    const bytes = new Uint8Array([lw_op, reg]);
+    write_bytes(out_file, bytes);
+}
+
+function handle_writing_bne_bytes(line_split: string[], out_file: string){
+    let op = op_codes.get(line_split[0].toLowerCase())!;
+    let op_r1 = op | Number(line_split[1][1]) << 4;
+    let r2_r3 = Number(line_split[2][1]) | Number(line_split[3][1]) << 4;
+    const bytes = new Uint8Array([op_r1, r2_r3]);
+    write_bytes(out_file, bytes);
+}
+
+function handle_writing_beq_bytes(line_split: string[], out_file: string){
+    let op = op_codes.get(line_split[0].toLowerCase())!;
+    let op_r1 = op | Number(line_split[1][1]) << 4;
+    let r2_r3 = Number(line_split[2][1]) | Number(line_split[3][1]) << 4;
+    const bytes = new Uint8Array([op_r1, r2_r3]);
+    write_bytes(out_file, bytes);
+}
+
+
+function handle_writing_inc_bytes(line_split: string[], out_file: string){
+    let op = op_codes.get(line_split[0].toLowerCase())!;
+    let r1 = Number(line_split[1][1]);
+    const bytes = new Uint8Array([op, r1]);
+    write_bytes(out_file, bytes);
+}
+
+
+function handle_writing_dec_bytes(line_split: string[], out_file: string){
+    let op = op_codes.get(line_split[0].toLowerCase())!;
+    let r1 = Number(line_split[1][1]);
+    const bytes = new Uint8Array([op, r1]);
+    write_bytes(out_file, bytes);
+}
+
 /** Here is where we do the writing of bytes as we read the 
  * instructions line by line
  */
@@ -154,6 +242,17 @@ async function produce_bytes(in_file:string, out_file:string){
             case "nop": handle_do_nothing(out_file);break;
             case "lw": handle_writing_lw_bytes(line_split,out_file);break;
             case "sw": handle_writing_sw_bytes(line_split,out_file);break;
+            case "add": handle_writing_add_bytes(line_split,out_file);break;
+            case "sub": handle_writing_sub_bytes(line_split,out_file);break;
+            case "mult": handle_writing_mult_bytes(line_split,out_file);
+                break;
+            case "div": handle_writing_div_bytes(line_split,out_file);break;
+            case "j": handle_writing_j_bytes(line_split, out_file);break;
+            case "jr": handle_writing_jr_bytes(line_split, out_file);break;
+            case "bne": handle_writing_bne_bytes(line_split,out_file);break;
+            case "beq": handle_writing_beq_bytes(line_split,out_file);break;
+            case "inc": handle_writing_inc_bytes(line_split,out_file);break;
+            case "dec": handle_writing_dec_bytes(line_split,out_file);break;
             default: console.log("Not handling:",line_split[0])
         }
 
