@@ -102,7 +102,6 @@ function handle_writing_li_bytes(line:string,
 
 function handle_writing_halt_bytes(out_file: string){
     let bytes = new Uint8Array([0,0]);
-    console.log("Handle halt");
     write_bytes(out_file,bytes);
 }
 
@@ -110,6 +109,15 @@ function handle_do_nothing(out_file: string){
     let do_nothing_num = op_codes.get("nop")!;
     let bytes = new Uint8Array([do_nothing_num,0]);
     write_bytes(out_file,bytes);
+}
+
+function handle_writing_lw_bytes(line_split: string[], out_file: string){
+    console.log("Handling lw");
+    let lw_op = op_codes.get(line_split[0].toLowerCase())!;
+    let lw_op_and_r = lw_op | Number(line_split[1][1]) << 4;
+    let second_r = Number(line_split[2][1]);
+    const bytes = new Uint8Array([lw_op_and_r, second_r]);
+    write_bytes(out_file, bytes);
 }
 
 /** Here is where we do the writing of bytes as we read the 
@@ -136,6 +144,7 @@ async function produce_bytes(in_file:string, out_file:string){
                 line_num, out_file); break;
             case "halt": handle_writing_halt_bytes(out_file);break;
             case "nop": handle_do_nothing(out_file);break;
+            case "lw": handle_writing_lw_bytes(line_split,out_file);break;
             default: console.log("Not handling:",line_split[0])
         }
 

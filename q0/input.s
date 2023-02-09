@@ -1,4 +1,5 @@
 ; a simple counter program.
+lw R1 R2
 nop
 li R1 0x00000000
 ; end
