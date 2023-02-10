@@ -13,10 +13,10 @@ let RAM = new Uint8Array(TOTAL_RAM);
 const PROG_SECTION = 0xCFFF;
 let END_PROG_SECTION = 0xCFFF;
 
-let REGISTERS: Uint16Array[] = [new Uint16Array([0x00,0x00]),
-    new Uint16Array([0x00,0x00]),new Uint16Array([0x00,0x00]) ]; 
-let PC = 0;
-let COND = 0;
+let REGISTERS: number[] = [0,0,0];
+let PC: number = PROG_SECTION;
+/// 0x1 means true 0x0 means false
+let COND: number = 0x0;
 
 // Used to pass byte position by reference
 // to functions
@@ -27,12 +27,9 @@ type BytePosition = {
 function print_state_of_registers(point: string){
     debug_print([point]);
     debug_print(["------------"]);
-    debug_print(["R1: 0x"+REGISTERS[0][0].toString(16)
-        +REGISTERS[0][1].toString(16)]);
-    debug_print(["R2: 0x"+REGISTERS[1][0].toString(16)
-        +REGISTERS[1][1].toString(16)]);
-    debug_print(["R3: 0x"+REGISTERS[2][0].toString(16)
-        +REGISTERS[2][1].toString(16)]);
+    debug_print(["R1: 0x"+REGISTERS[0].toString(16)]);
+    debug_print(["R2: 0x"+REGISTERS[1].toString(16)]);
+    debug_print(["R3: 0x"+REGISTERS[2].toString(16)]);
     debug_print(["PC: 0x"+PC.toString(16)]);
     debug_print(["COND: 0x"+COND.toString(16)]);
     debug_print(["------------"]);
@@ -85,25 +82,75 @@ function load_program_to_ram(){
     debug_print(["Done loading program into RAM"]);
 }
 
+function handle_bytes_nop(byte_position: BytePosition){
+    //increment byte_position
+    byte_position.byte_position+=1;
+    debug_print(["nop"]);
+    //set PC register
+    PC += 2;
+}
+
 function handle_bytes_li(byte_position: BytePosition){
     let u8 = RAM[byte_position.byte_position];
-    let register = (u8 & 0xF0) >> 4;
-    if(register > 3){
-        console.error("Error, register",register,"not a valid register");
+    let register = ((u8 & 0xF0) >> 4)-1;
+    if(register > 2 || register < 0){
+        console.error("Error, R"+register,"not a valid register");
         process.exit(-1);
     }
 
     //read the next bytes
     const byte1 = RAM[++(byte_position.byte_position)];
     const byte2 = RAM[++(byte_position.byte_position)];
-    let data = new Uint16Array([byte1,byte2]);
-    debug_print(["li R"+register+" 0x"+byte1.toString(16)+byte2.toString(16)]);
+    let data = byte1 << 8 | byte2;
+    debug_print(["li R"+(register+1)+
+        " 0x"+data.toString(16)]);
+
     //set the register to the data read
-    REGISTERS[register-1] = data;
+    REGISTERS[register] = data;
+    PC += 3;
+}
+
+
+function handle_bytes_sw(byte_position: BytePosition){
+    let r_1 = ((RAM[byte_position.byte_position] & 0xF0) >> 4)-1;
+    let r_2 = (RAM[++(byte_position.byte_position)]) -1
+
+
+    if(r_1 > 2 || r_1 < 0 || r_2 > 2 || r_2 < 0){
+        console.log("Error, general register can only be  R1 R2 R3");
+        process.exit();
+    }
+
+    debug_print(["sw R"+(r_1+1)+" R"+(r_2+1)]);
+
+    //setup the RAM at location @r_1 with the contents of r_2
+    const b1 =  REGISTERS[r_2]>>8;
+    const b2 = (REGISTERS[r_2] & 0x00FF);
+    RAM[REGISTERS[r_1]] = b1;
+    RAM[REGISTERS[r_1]+1] = b2;
+
+    //setup registers
+    PC+=2;
 }
 
 function handle_bytes_lw(byte_position: BytePosition){
+    const r_1 = ((RAM[byte_position.byte_position] & 0xF0) >> 4) -1;
+    const r_2 = RAM[++(byte_position.byte_position)] -1;
+    debug_print(["lw R"+(r_1+1)+" R"+(r_2+1)]);
+
+    if(r_1 > 2 || r_1 < 0 || r_2 > 2 || r_2 < 0){
+        console.log("Error, general register can only be  R1 R2 R3");
+        process.exit();
+    }
+
+    //setup registers
+    PC+=2;
+    //get the 2 bytes at ram starting from location of r_2 
+    const data = RAM[REGISTERS[r_2]];
+    const data2 = RAM[REGISTERS[r_2]+1];
+    REGISTERS[r_1]= ( data << 8) | data2;
 }
+
 
 function handle_instruction(byte_position: BytePosition){
     print_state_of_registers("--BEFORE--");
@@ -112,10 +159,11 @@ function handle_instruction(byte_position: BytePosition){
     let instruction = u8 & 0x0F;
 
     switch(op_codes.get(instruction)){
-        case "halt": process.exit(0);
-        case "nop": byte_position.byte_position+=1; break;
+        case "halt": debug_print(["halting"]);process.exit(0);
+        case "nop": handle_bytes_nop(byte_position); break;
         case "li": handle_bytes_li(byte_position);break;
         case "lw": handle_bytes_lw(byte_position);break;
+        case "sw": handle_bytes_sw(byte_position);break;
         default: {
             console.error("Instruction set of: 0x"
                 +instruction.toString(16)+" not found, exiting.");

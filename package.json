@@ -7,7 +7,9 @@
   "scripts": {
     "build": "tsc",
     "q0_p1": "tsc && node ./build/p1.js",
-    "q0_p2": "tsc && node ./build/p2.js"
+    "q0_p2": "tsc && node ./build/p2.js",
+    "q0_test_build": "tsc && node ./build/p1.js ./q0/input_test.s ./q0/test.bin && hexdump ./q0/test.bin > ./q0/test.hex",
+    "q0_p2_test": "npm run q0_test_build && node ./build/p2.js ./q0/test.bin --debug"
   },
   "author": "brian.orwe@gmail.com",
   "license": "MIT",
