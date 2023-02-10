@@ -136,12 +136,13 @@ function handle_bytes_sw(byte_position: BytePosition){
 function handle_bytes_lw(byte_position: BytePosition){
     const r_1 = ((RAM[byte_position.byte_position] & 0xF0) >> 4) -1;
     const r_2 = RAM[++(byte_position.byte_position)] -1;
-    debug_print(["lw R"+(r_1+1)+" R"+(r_2+1)]);
 
     if(r_1 > 2 || r_1 < 0 || r_2 > 2 || r_2 < 0){
         console.log("Error, general register can only be  R1 R2 R3");
         process.exit();
     }
+
+    debug_print(["lw R"+(r_1+1)+" R"+(r_2+1)]);
 
     //setup registers
     PC+=2;
@@ -149,6 +150,27 @@ function handle_bytes_lw(byte_position: BytePosition){
     const data = RAM[REGISTERS[r_2]];
     const data2 = RAM[REGISTERS[r_2]+1];
     REGISTERS[r_1]= ( data << 8) | data2;
+}
+
+function handle_bytes_add(byte_position: BytePosition){
+    const r_1 = ((RAM[byte_position.byte_position] & 0xF0) >> 4)-1;
+    const r_2 = (RAM[++(byte_position.byte_position)] & 0xF) -1;
+    const r_3 = ((RAM[byte_position.byte_position] & 0xF0) >> 4)-1;
+
+
+    if(r_1 > 2 || r_1 < 0 || r_2 > 2 || r_2 < 0 || r_3 > 2 || r_3 < 0){
+        console.log("Error, general register can only be  R1 R2 R3");
+        process.exit();
+    }
+
+    debug_print(["add R"+(r_1+1)+" R"+(r_2+1)+" R"+(r_3+1)]);
+
+    //setup registers
+    PC+=2;
+    let data = new Uint16Array([REGISTERS[r_2]+REGISTERS[r_3]]);
+    //wrap around the data once it goes beyond 0xFFFF
+    console.log("DATA:",data.values().next().value);
+    REGISTERS[r_1] = Number(data);
 }
 
 
@@ -164,6 +186,7 @@ function handle_instruction(byte_position: BytePosition){
         case "li": handle_bytes_li(byte_position);break;
         case "lw": handle_bytes_lw(byte_position);break;
         case "sw": handle_bytes_sw(byte_position);break;
+        case "add": handle_bytes_add(byte_position);break;
         default: {
             console.error("Instruction set of: 0x"
                 +instruction.toString(16)+" not found, exiting.");
