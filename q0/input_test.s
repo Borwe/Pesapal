@@ -5,4 +5,6 @@ sw R2 R1
 lw R3 R2
 add R2 R1 R3
 sub R3 R1 R1
+li R3 0x00000002
+mult R3 R1 R3
 halt
