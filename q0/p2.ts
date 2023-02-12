@@ -255,6 +255,17 @@ function handle_bytes_j(byte_position: BytePosition){
     PC=data;
 }
 
+function handle_bytes_inc(byte_position: BytePosition){
+    const r_1 = RAM[++(byte_position.byte_position)] -1;
+
+    debug_print(["inc R"+(r_1+1)]);
+
+    REGISTERS[r_1]+=1;
+
+    //setup registers
+    PC+=2;
+}
+
 function handle_instruction(byte_position: BytePosition){
     print_state_of_registers("--BEFORE--");
     //this is the 8 bits that normally contains the instruction type
@@ -272,6 +283,7 @@ function handle_instruction(byte_position: BytePosition){
         case "mult": handle_bytes_mult(byte_position);break;
         case "div": handle_bytes_div(byte_position);break;
         case "j": handle_bytes_j(byte_position);break;
+        case "inc": handle_bytes_inc(byte_position);break;
         default: {
             console.error("Instruction set of: 0x"
                 +instruction.toString(16)+" not found, exiting.");
