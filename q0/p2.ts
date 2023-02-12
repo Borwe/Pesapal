@@ -215,6 +215,32 @@ function handle_bytes_mult(byte_position: BytePosition){
     REGISTERS[r_1] = Number(data);
 }
 
+function handle_bytes_div(byte_position: BytePosition){
+    const r_1 = ((RAM[byte_position.byte_position] & 0xF0) >> 4)-1;
+    const r_2 = (RAM[++(byte_position.byte_position)] & 0xF) -1;
+    const r_3 = ((RAM[byte_position.byte_position] & 0xF0) >> 4)-1;
+
+
+    if(r_1 > 2 || r_1 < 0 || r_2 > 2 || r_2 < 0 || r_3 > 2 || r_3 < 0){
+        console.error("Error, general register can only be  R1 R2 R3");
+        process.exit();
+    }
+
+    debug_print(["div R"+(r_1+1)+" R"+(r_2+1)+" R"+(r_3+1)]);
+
+    if(REGISTERS[r_3]==0){
+        console.error("div with R"+(r_3+1)+" Can't happen since it's zero");
+        process.exit();
+    }
+    
+    //setup registers
+    PC+=2;
+    //we do this to avoid moving past 16bits which number does by default
+    let data = new Uint16Array([REGISTERS[r_2]/REGISTERS[r_3]]);
+    //wrap around the data once it goes beyond 0xFFFF
+    REGISTERS[r_1] = Number(data);
+}
+
 function handle_instruction(byte_position: BytePosition){
     print_state_of_registers("--BEFORE--");
     //this is the 8 bits that normally contains the instruction type
@@ -230,6 +256,7 @@ function handle_instruction(byte_position: BytePosition){
         case "add": handle_bytes_add(byte_position);break;
         case "sub": handle_bytes_sub(byte_position);break;
         case "mult": handle_bytes_mult(byte_position);break;
+        case "div": handle_bytes_div(byte_position);break;
         default: {
             console.error("Instruction set of: 0x"
                 +instruction.toString(16)+" not found, exiting.");

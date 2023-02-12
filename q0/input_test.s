@@ -7,4 +7,6 @@ add R2 R1 R3
 sub R3 R1 R1
 li R3 0x00000002
 mult R3 R1 R3
+li R3 0x00000000
+div R2 R2 R3
 halt
