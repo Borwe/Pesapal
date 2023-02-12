@@ -241,6 +241,20 @@ function handle_bytes_div(byte_position: BytePosition){
     REGISTERS[r_1] = Number(data);
 }
 
+function handle_bytes_j(byte_position: BytePosition){
+    const d_1 = RAM[++(byte_position.byte_position)];
+    const d_2 = RAM[++(byte_position.byte_position)];
+    const data = (d_1 << 8) | d_2;
+
+    debug_print(["j 0x"+data.toString(16)]);
+
+    // set position to one byte before the data position due
+    // to line increment at line 294
+    byte_position.byte_position=data-1;
+    //setup registers
+    PC=data;
+}
+
 function handle_instruction(byte_position: BytePosition){
     print_state_of_registers("--BEFORE--");
     //this is the 8 bits that normally contains the instruction type
@@ -257,6 +271,7 @@ function handle_instruction(byte_position: BytePosition){
         case "sub": handle_bytes_sub(byte_position);break;
         case "mult": handle_bytes_mult(byte_position);break;
         case "div": handle_bytes_div(byte_position);break;
+        case "j": handle_bytes_j(byte_position);break;
         default: {
             console.error("Instruction set of: 0x"
                 +instruction.toString(16)+" not found, exiting.");
