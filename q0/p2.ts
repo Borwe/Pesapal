@@ -38,7 +38,7 @@ function print_state_of_registers(point: string){
 function wait_enter_input(){
     if(DEBUG==true){
         console.log("Press [enter] to resume");
-        let buf = new Buffer(8);
+        let buf = Buffer.alloc(8,0);
         let fd: number = process.stdin.fd;
         try{
             fd = fs.openSync('/dev/stdin',"rs");
