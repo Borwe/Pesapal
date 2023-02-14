@@ -285,7 +285,29 @@ function handle_bytes_beq(byte_position: BytePosition){
         //use -1 due to increment on handle_instruction()
         byte_position.byte_position=PROG_SECTION+REGISTERS[r_3]-1;
         PC = PROG_SECTION + REGISTERS[r_3];
-        console.log("MOVE TO r3:",REGISTERS[r_3].toString(16));
+        return;
+    }
+
+    //setup registers
+    PC += 2;
+}
+
+
+function handle_bytes_bne(byte_position: BytePosition){
+    const d_1 = RAM[(byte_position.byte_position)] ;
+    const d_2 = RAM[++(byte_position.byte_position)] ;
+
+    const r_1 = ((d_1 & 0xF0) >> 4) -1;
+    const r_2 = (d_2 & 0x0F) -1;
+    const r_3 = ((d_2 & 0xF0) >> 4) -1;
+
+    debug_print(["bne R"+(r_1+1)+" R"+(r_2+1)+" R"+(r_3+1)]);
+
+    if(REGISTERS[r_1]!=REGISTERS[r_2]){
+        //move to program location stored in r_3
+        //use -1 due to increment on handle_instruction()
+        byte_position.byte_position=PROG_SECTION+REGISTERS[r_3]-1;
+        PC = PROG_SECTION + REGISTERS[r_3];
         return;
     }
 
@@ -334,6 +356,7 @@ function handle_instruction(byte_position: BytePosition){
         case "j": handle_bytes_j(byte_position);break;
         case "jr": handle_bytes_jr(byte_position);break;
         case "beq": handle_bytes_beq(byte_position);break;
+        case "bne": handle_bytes_bne(byte_position);break;
         case "inc": handle_bytes_inc(byte_position);break;
         case "dec": handle_bytes_dec(byte_position);break;
         default: {
