@@ -255,6 +255,20 @@ function handle_bytes_j(byte_position: BytePosition){
     PC=data;
 }
 
+
+function handle_bytes_jr(byte_position: BytePosition){
+    const d_1 = RAM[++(byte_position.byte_position)] -1;
+    const r_1 = REGISTERS[d_1];
+
+    debug_print(["jr R"+(d_1+1)+" data: "+r_1]);
+
+    // set position to one byte before the data position due
+    // to line increment at line 294
+    byte_position.byte_position=PROG_SECTION+r_1-1;
+    //setup registers
+    PC = PROG_SECTION+r_1;
+}
+
 function handle_bytes_inc(byte_position: BytePosition){
     const r_1 = RAM[++(byte_position.byte_position)] -1;
 
@@ -294,6 +308,7 @@ function handle_instruction(byte_position: BytePosition){
         case "mult": handle_bytes_mult(byte_position);break;
         case "div": handle_bytes_div(byte_position);break;
         case "j": handle_bytes_j(byte_position);break;
+        case "jr": handle_bytes_jr(byte_position);break;
         case "inc": handle_bytes_inc(byte_position);break;
         case "dec": handle_bytes_dec(byte_position);break;
         default: {
