@@ -24,6 +24,33 @@ type BytePosition = {
     byte_position: number;
 }
 
+function check_registers_and_fail_if_invalid(r1: number,
+    r2: number | undefined = undefined, r3: number | undefined = undefined){
+    if(r1 > 2 || r1 < 0){
+        console.error("Error occured:");
+        console.error("R"+(r1+1)+" is not a valid register");
+        DEBUG=true;
+        print_state_of_registers("--ERROR--");
+        process.exit(-1);
+    }
+
+    if(r2 != undefined && (r2 >2 || r2 < 0)){
+        console.error("Error occured:");
+        console.error("R"+(r2+1)+" is not a valid register");
+        DEBUG=true;
+        print_state_of_registers("--ERROR--");
+        process.exit(-1);
+    }
+
+    if(r3 != undefined && (r3 >2 || r3 < 0)){
+        console.error("Error occured:");
+        console.error("R"+(r3+1)+" is not a valid register");
+        DEBUG=true;
+        print_state_of_registers("--ERROR--");
+        process.exit(-1);
+    }
+}
+
 function print_state_of_registers(point: string){
     debug_print([point]);
     debug_print(["------------"]);
@@ -93,10 +120,8 @@ function handle_bytes_nop(byte_position: BytePosition){
 function handle_bytes_li(byte_position: BytePosition){
     let u8 = RAM[byte_position.byte_position];
     let register = ((u8 & 0xF0) >> 4)-1;
-    if(register > 2 || register < 0){
-        console.error("Error, R"+register,"not a valid register");
-        process.exit(-1);
-    }
+
+    check_registers_and_fail_if_invalid(register);
 
     //read the next bytes
     const byte1 = RAM[++(byte_position.byte_position)];
@@ -115,11 +140,7 @@ function handle_bytes_sw(byte_position: BytePosition){
     let r_1 = ((RAM[byte_position.byte_position] & 0xF0) >> 4)-1;
     let r_2 = (RAM[++(byte_position.byte_position)]) -1
 
-
-    if(r_1 > 2 || r_1 < 0 || r_2 > 2 || r_2 < 0){
-        console.log("Error, general register can only be  R1 R2 R3");
-        process.exit();
-    }
+    check_registers_and_fail_if_invalid(r_1, r_2);
 
     debug_print(["sw R"+(r_1+1)+" R"+(r_2+1)]);
 
@@ -137,10 +158,7 @@ function handle_bytes_lw(byte_position: BytePosition){
     const r_1 = ((RAM[byte_position.byte_position] & 0xF0) >> 4) -1;
     const r_2 = RAM[++(byte_position.byte_position)] -1;
 
-    if(r_1 > 2 || r_1 < 0 || r_2 > 2 || r_2 < 0){
-        console.log("Error, general register can only be  R1 R2 R3");
-        process.exit();
-    }
+    check_registers_and_fail_if_invalid(r_1, r_2);
 
     debug_print(["lw R"+(r_1+1)+" R"+(r_2+1)]);
 
@@ -158,10 +176,7 @@ function handle_bytes_add(byte_position: BytePosition){
     const r_3 = ((RAM[byte_position.byte_position] & 0xF0) >> 4)-1;
 
 
-    if(r_1 > 2 || r_1 < 0 || r_2 > 2 || r_2 < 0 || r_3 > 2 || r_3 < 0){
-        console.log("Error, general register can only be  R1 R2 R3");
-        process.exit();
-    }
+    check_registers_and_fail_if_invalid(r_1, r_2, r_3);
 
     debug_print(["add R"+(r_1+1)+" R"+(r_2+1)+" R"+(r_3+1)]);
 
@@ -178,11 +193,7 @@ function handle_bytes_sub(byte_position: BytePosition){
     const r_2 = (RAM[++(byte_position.byte_position)] & 0xF) -1;
     const r_3 = ((RAM[byte_position.byte_position] & 0xF0) >> 4)-1;
 
-
-    if(r_1 > 2 || r_1 < 0 || r_2 > 2 || r_2 < 0 || r_3 > 2 || r_3 < 0){
-        console.log("Error, general register can only be  R1 R2 R3");
-        process.exit();
-    }
+    check_registers_and_fail_if_invalid(r_1, r_2, r_3);
 
     debug_print(["sub R"+(r_1+1)+" R"+(r_2+1)+" R"+(r_3+1)]);
     
@@ -199,11 +210,7 @@ function handle_bytes_mult(byte_position: BytePosition){
     const r_2 = (RAM[++(byte_position.byte_position)] & 0xF) -1;
     const r_3 = ((RAM[byte_position.byte_position] & 0xF0) >> 4)-1;
 
-
-    if(r_1 > 2 || r_1 < 0 || r_2 > 2 || r_2 < 0 || r_3 > 2 || r_3 < 0){
-        console.log("Error, general register can only be  R1 R2 R3");
-        process.exit();
-    }
+    check_registers_and_fail_if_invalid(r_1, r_2, r_3);
 
     debug_print(["mult R"+(r_1+1)+" R"+(r_2+1)+" R"+(r_3+1)]);
     
@@ -220,11 +227,7 @@ function handle_bytes_div(byte_position: BytePosition){
     const r_2 = (RAM[++(byte_position.byte_position)] & 0xF) -1;
     const r_3 = ((RAM[byte_position.byte_position] & 0xF0) >> 4)-1;
 
-
-    if(r_1 > 2 || r_1 < 0 || r_2 > 2 || r_2 < 0 || r_3 > 2 || r_3 < 0){
-        console.error("Error, general register can only be  R1 R2 R3");
-        process.exit();
-    }
+    check_registers_and_fail_if_invalid(r_1, r_2, r_3);
 
     debug_print(["div R"+(r_1+1)+" R"+(r_2+1)+" R"+(r_3+1)]);
 
@@ -260,6 +263,8 @@ function handle_bytes_jr(byte_position: BytePosition){
     const d_1 = RAM[++(byte_position.byte_position)] -1;
     const r_1 = REGISTERS[d_1];
 
+    check_registers_and_fail_if_invalid(d_1)
+
     debug_print(["jr R"+(d_1+1)]);
 
     // set position to one byte before the data position due
@@ -277,6 +282,8 @@ function handle_bytes_beq(byte_position: BytePosition){
     const r_1 = ((d_1 & 0xF0) >> 4) -1;
     const r_2 = (d_2 & 0x0F) -1;
     const r_3 = ((d_2 & 0xF0) >> 4) -1;
+
+    check_registers_and_fail_if_invalid(r_1, r_2, r_3);
 
     debug_print(["beq R"+(r_1+1)+" R"+(r_2+1)+" R"+(r_3+1)]);
 
@@ -301,13 +308,15 @@ function handle_bytes_bne(byte_position: BytePosition){
     const r_2 = (d_2 & 0x0F) -1;
     const r_3 = ((d_2 & 0xF0) >> 4) -1;
 
+    check_registers_and_fail_if_invalid(r_1, r_2, r_3);
+
     debug_print(["bne R"+(r_1+1)+" R"+(r_2+1)+" R"+(r_3+1)]);
 
     if(REGISTERS[r_1]!=REGISTERS[r_2]){
         //move to program location stored in r_3
         //use -1 due to increment on handle_instruction()
         byte_position.byte_position=PROG_SECTION+REGISTERS[r_3]-1;
-        PC = PROG_SECTION + REGISTERS[r_3];
+        PC = byte_position.byte_position+1;
         return;
     }
 
@@ -318,6 +327,8 @@ function handle_bytes_bne(byte_position: BytePosition){
 function handle_bytes_inc(byte_position: BytePosition){
     const r_1 = RAM[++(byte_position.byte_position)] -1;
 
+    check_registers_and_fail_if_invalid(r_1);
+
     debug_print(["inc R"+(r_1+1)]);
 
     REGISTERS[r_1]+=1;
@@ -326,8 +337,17 @@ function handle_bytes_inc(byte_position: BytePosition){
     PC+=2;
 }
 
+function handle_halt(){
+    DEBUG=true;
+    print_state_of_registers("--HALTING--");
+    debug_print(["halting"]);
+    process.exit(0)
+}
+
 function handle_bytes_dec(byte_position: BytePosition){
     const r_1 = RAM[++(byte_position.byte_position)] -1;
+
+    check_registers_and_fail_if_invalid(r_1);
 
     debug_print(["dec R"+(r_1+1)]);
 
@@ -344,7 +364,7 @@ function handle_instruction(byte_position: BytePosition){
     let instruction = u8 & 0x0F;
 
     switch(op_codes.get(instruction)){
-        case "halt": debug_print(["halting"]);process.exit(0);
+        case "halt": handle_halt();break;
         case "nop": handle_bytes_nop(byte_position); break;
         case "li": handle_bytes_li(byte_position);break;
         case "lw": handle_bytes_lw(byte_position);break;
