@@ -17,4 +17,4 @@ li R3 back
 bne R1 R2 R3
 ;jr R3
 ;j 0x0000CFFF
-;halt
+halt
