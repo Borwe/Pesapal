@@ -13,6 +13,7 @@ div R2 R2 R3
 inc R3
 dec R3
 li R3 back
+beq R1 R2 R3
 ;jr R3
 ;j 0x0000CFFF
 ;halt
