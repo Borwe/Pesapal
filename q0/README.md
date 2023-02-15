@@ -22,4 +22,4 @@ node ./build/q0p1.js ./assembly.s ./output.bin
 the `./assembly.s` file here being the file that contains the instructions
 to be turned to byte code, and the `./output.bin` is where the bytes should be written to.
 
-The code for the assembler is located [here](./q0/q0p1.ts)
+The code for the assembler is located [here](./q0p1.ts)
