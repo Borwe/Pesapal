@@ -23,3 +23,10 @@ the `./assembly.s` file here being the file that contains the instructions
 to be turned to byte code, and the `./output.bin` is where the bytes should be written to.
 
 The code for the assembler is located [here](./q0p1.ts)
+
+### Structure of production.
+- We first read the `assembly.s` line for line and mark which labels should appear after what instruction.
+- Then we re-read the file line by line, handling all the instruction sets, producing bytes to be written on the file taking the labels to account.
+- The bytes once read per line an formed into a 16bit byte array are then written to the outputfile, after which we go to the next line, and repeat.
+- lines starting with ';' are ignored.
+- This process keeps going on until we reach the end of the file `assembly.s` file.
