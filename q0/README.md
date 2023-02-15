@@ -57,3 +57,15 @@ Once the virtual machine is done running, either due to an error or because it h
 ## Discovery when doing this question
 
 - At first I thought running the assembly from part2 of the question was buggy, but on second look it came to my attention that it stops not because there was a bug, but because at some point the instruction `sw R1 R1` started overiting the program memory which begins at 0xCFFF, changing and halting the program at PC 0xd008.
+
+## Shortcut to run the part2 with the given input from question 0.
+Just run the following command, it would compile the assembly from the question located (here)[./input_p2.s], and then run the binary file generated from the compilation with the `--debug` flag.
+
+```shell
+npm run q0_p2_q
+```
+
+This basically runs:
+```shell
+tsc && node ./build/q0p1.js ./q0/input_p2.s ./q0.bin && node ./build/q0p2.js ./q0.bin --debug
+```

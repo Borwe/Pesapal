@@ -9,7 +9,8 @@
     "q0_p1": "tsc && node ./build/q0p1.js",
     "q0_p2": "tsc && node ./build/q0p2.js",
     "q0_test_build": "tsc && node ./build/q0p1.js ./q0/input_test.s ./q0/test.bin && hexdump ./q0/test.bin > ./q0/test.hex",
-    "q0_p2_test": "npm run q0_test_build && node ./build/q0p2.js ./q0/test.bin --debug"
+    "q0_p2_test": "npm run q0_test_build && node ./build/q0p2.js ./q0/test.bin --debug",
+    "q0_p2_q":"tsc && node ./build/q0p1.js ./q0/input_p2.s ./q0.bin && node ./build/q0p2.js ./q0.bin --debug"
   },
   "author": "brian.orwe@gmail.com",
   "license": "MIT",
