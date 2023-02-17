@@ -16,7 +16,7 @@ It would output the executable javascript bundle in the `./build` folder where t
 
 To produce the byte code one needs to run the following code:
 ```shell
-node ./build/q0p1.js ./assembly.s ./output.bin
+node ./build/q0/q0p1.js ./assembly.s ./output.bin
 ```
 
 the `./assembly.s` file here being the file that contains the instructions
@@ -67,5 +67,5 @@ npm run q0_p2_q
 
 This basically runs:
 ```shell
-tsc && node ./build/q0p1.js ./q0/input_p2.s ./q0.bin && node ./build/q0p2.js ./q0.bin --debug
+tsc && node ./build/q0/q0p1.js ./q0/input_p2.s ./q0.bin && node ./build/q0/q0p2.js ./q0.bin --debug
 ```
