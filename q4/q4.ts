@@ -146,7 +146,6 @@ function handle_variables_and_execute(buf: Buffer){
  */
 function main(){
   //check if --debug field passed, if so then enable debug printing
-  console.log("ARGS",process.argv);
   if(process.argv[2]=="--debug"){
     DEBUG=true;
   }
