@@ -10,9 +10,10 @@ All solutions in this repo use typescript, they have been tasted on:
 Versions above the above requirements should be able to run.
 
 ## Setup
-Before running any solution make sure you have run the following command:
+Before running any solution make sure you have run the following commands, to install dependencies and compile files:
 ```shell
 npm install
+npm run build
 ```
 This command would work if you have nodejs installed in your OS with npm that should come with it out of the box.
 
