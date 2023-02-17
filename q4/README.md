@@ -7,7 +7,7 @@
 ## How it works
 * ∧ -> means && has higher precedence than ||
 * ∨ -> means || has higher precendence than ==
-* = -> means ==
+* = -> means == if after the first = that comes if let key word is used.
 * ¬ -> means ! which has highest precendance
 
 When a `let` is used to start a statement, that means we take the second valueas the variable name, then the rest of the commands after the first = sign are what we process and assign the variable we label as the second value. eg:
